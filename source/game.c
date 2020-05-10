@@ -23,7 +23,9 @@ void gameBegin(Game* game, Direction starting_dir)
 
 void gameSetNextDir(Game* game, Direction next)
 {
-    game->next_dir = next;
+    // If sum of cardinal directions is odd (is perpindicular)
+    if ((game->next_dir + next) % 2 == 1)
+        game->next_dir = next;
 }
 
 void blipSetNextTargets(Blip* blip, Direction next)
