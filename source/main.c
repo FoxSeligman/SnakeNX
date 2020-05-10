@@ -34,14 +34,14 @@
 
 bool determineDirection(Direction* dir, u64 kDown)
 {
-    if (kDown & KEY_LSTICK_UP) {
+    if (kDown & KEY_LSTICK_LEFT) {
+        *dir = DIR_LEFT;
+    } else if (kDown & KEY_LSTICK_UP) {
         *dir = DIR_UP;
     } else if (kDown & KEY_LSTICK_RIGHT) {
         *dir = DIR_RIGHT;
     } else if (kDown & KEY_LSTICK_DOWN) {
         *dir = DIR_DOWN;
-    } else if (kDown & KEY_LSTICK_LEFT) {
-        *dir = DIR_LEFT;
     } else {
         return false;
     }

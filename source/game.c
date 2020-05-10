@@ -34,22 +34,22 @@ void blipSetNextTargets(Blip* blip, Direction next)
     blip->row = blip->target_row;
 
     switch(next) {
-    case DIR_UP:
-        blip->target_column = blip->column;
-        blip->target_row = blip->row + 1;
-        break;
-    case DIR_DOWN:
-        blip->target_column = blip->column;
-        blip->target_row = blip->row - 1;
-        break;
     case DIR_LEFT:
         blip->target_column = blip->column - 1;
         blip->target_row = blip->row;
         break;
+    case DIR_UP:
+        blip->target_column = blip->column;
+        blip->target_row = blip->row + 1;
+        break;
     case DIR_RIGHT:
-    default:
         blip->target_column = blip->column + 1;
         blip->target_row = blip->row;
+        break;
+    case DIR_DOWN:
+    default:
+        blip->target_column = blip->column;
+        blip->target_row = blip->row - 1;
     }
 }
 

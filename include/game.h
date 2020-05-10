@@ -1,10 +1,10 @@
 #include <switch.h>
 
 typedef enum {
-    DIR_UP = 0,
-    DIR_RIGHT = 1,
-    DIR_DOWN = 2,
-    DIR_LEFT = 3
+    DIR_LEFT = 0,
+    DIR_UP = 1,
+    DIR_RIGHT = 2,
+    DIR_DOWN = 3
 } Direction;
 
 /// Blip structure.
