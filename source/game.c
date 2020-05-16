@@ -37,29 +37,40 @@ void gameSetNextDir(Game* game, Direction next)
         game->next_dir = next;
 }
 
-void blipSetNextTargets(Blip* blip, Direction next)
+void blipSetNextTargetsRecursive(Blip* blip, u32 target_column, u32 target_row)
 {
+    if (blip->next)
+        blipSetNextTargetsRecursive(blip->next, blip->column, blip->row);
+
     blip->column = blip->target_column;
     blip->row = blip->target_row;
 
+    blip->target_column = target_column;
+    blip->target_row = target_row;
+}
+
+void blipSetNextTargets(Blip* blip, Direction next)
+{
+    u32 target_column = blip->target_column;
+    u32 target_row = blip->target_row;
+
     switch(next) {
     case DIR_LEFT:
-        blip->target_column = blip->column - 1;
-        blip->target_row = blip->row;
+        target_column -= 1;
         break;
     case DIR_UP:
-        blip->target_column = blip->column;
-        blip->target_row = blip->row + 1;
+        target_row += 1;
         break;
     case DIR_RIGHT:
-        blip->target_column = blip->column + 1;
-        blip->target_row = blip->row;
+        target_column += 1;
         break;
     case DIR_DOWN:
     default:
-        blip->target_column = blip->column;
+        target_row -= 1;
         blip->target_row = blip->row - 1;
     }
+
+    blipSetNextTargetsRecursive(blip, target_column, target_row);
 }
 
 void blipDeleteRecursive(Blip* blip)
