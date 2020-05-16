@@ -1,8 +1,15 @@
 #include "game.h"
 
+void blipInit(Blip* blip)
+{
+    blip->next = NULL;
+}
+
 void gameInit(Game* game)
 {
     game->has_started = false;
+    
+    blipInit(&game->root_blip);
 }
 
 void gameBegin(Game* game, Direction starting_dir)
