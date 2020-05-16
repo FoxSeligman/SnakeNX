@@ -152,6 +152,7 @@ int main(int argc, char* argv[])
         framebufferEnd(&fb);
     }
 
+    gameCleanup(&game);
     framebufferClose(&fb);
 
     return 0;

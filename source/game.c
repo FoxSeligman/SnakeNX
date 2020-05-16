@@ -1,5 +1,7 @@
 #include "game.h"
 
+#include <stdlib.h>
+
 void blipInit(Blip* blip)
 {
     blip->next = NULL;
@@ -60,6 +62,14 @@ void blipSetNextTargets(Blip* blip, Direction next)
     }
 }
 
+void blipDeleteRecursive(Blip* blip)
+{
+    if (blip->next)
+        blipDeleteRecursive(blip->next);
+
+    free(blip);
+}
+
 void gameUpdate(Game* game, float delta_time)
 {
     float new_progress = game->progress + delta_time / game->settings.speed;
@@ -69,4 +79,10 @@ void gameUpdate(Game* game, float delta_time)
     }
     
     game->progress = new_progress;
+}
+
+void gameCleanup(Game* game)
+{
+    if (game->root_blip.next)
+        blipDeleteRecursive(game->root_blip.next);
 }

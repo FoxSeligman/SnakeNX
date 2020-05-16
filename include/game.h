@@ -34,3 +34,4 @@ void gameInit(Game* game);
 void gameBegin(Game* game, Direction next);
 void gameSetNextDir(Game* game, Direction next);
 void gameUpdate(Game* game, float delta_time);
+void gameCleanup(Game* game);
