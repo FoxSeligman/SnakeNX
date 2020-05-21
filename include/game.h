@@ -3,12 +3,7 @@
 
 #include <switch.h>
 
-typedef enum {
-    DIR_LEFT = 0,
-    DIR_UP = 1,
-    DIR_RIGHT = 2,
-    DIR_DOWN = 3
-} Direction;
+#include "utility.h"
 
 /// Blip structure.
 typedef struct Blip {
@@ -18,13 +13,6 @@ typedef struct Blip {
     u32 row;
     struct Blip* next;
 } Blip;
-
-/// Game settings structure.
-typedef struct Settings {
-    int columns;
-    int rows;
-    float speed;    // Seconds per cell
-} Settings;
 
 /// Game structure.
 typedef struct Game {
