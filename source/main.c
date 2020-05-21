@@ -110,6 +110,7 @@ int main(int argc, char* argv[])
     // Time
     struct timeval lastTimestamp;
     float deltaTime;
+    getDeltaTime(&deltaTime, &lastTimestamp);   // Initialize values
 
     // Main loop
     while (appletMainLoop())
@@ -151,7 +152,6 @@ int main(int argc, char* argv[])
         }
 
         renderBlip(&game, &game.root_blip, framebuf, stride);
-        // renderBlip(&game, &game.loose_blip, framebuf, stride);
         
         // We're done rendering, so we end the frame here.
         framebufferEnd(&fb);

@@ -9,27 +9,22 @@ void blipInit(Blip* blip, u32 column, u32 row)
     blip->row = blip->target_row = row;
 }
 
-// void gameMoveLooseBlip(Game* game)
+// What the game should look like before the first move is made
 void gameInit(Game* game, u32 columns, u32 rows, float speed)
 {
+    game->has_started = false;
+    
     game->settings.columns = columns;
     game->settings.rows = rows;
     game->settings.speed = speed;
-    game->has_started = false;
     
-    // time_t t;
     blipInit(&game->root_blip, game->settings.columns / 2, game->settings.rows / 2);
+    game->progress = 1;
 }
 
-// Blip* getLastBlip(Blip* blip)
+// What the game should look like as soon as the first move is made
 void gameStart(Game* game, Direction starting_dir)
 {
-    game->next_dir = starting_dir;
-
-    blipInit(&game->root_blip, game->settings.columns / 2, game->settings.rows / 2);
-
-    game->progress = 1;
-
     game->next_dir = starting_dir;
 
     game->has_started = true;
@@ -88,13 +83,15 @@ void blipDeleteRecursive(Blip* blip)
 
 void gameUpdate(Game* game, float delta_time)
 {
-    float new_progress = game->progress + delta_time / game->settings.speed;
-    if (new_progress >= 1) {
-        blipSetNextTargets(&game->root_blip, game->next_dir);
-        new_progress -= 1;
+    if (game->has_started) {
+        float new_progress = game->progress + delta_time / game->settings.speed;
+        if (new_progress >= 1) {
+            blipSetNextTargets(&game->root_blip, game->next_dir);
+            new_progress -= 1;
+        }
+        
+        game->progress = new_progress;
     }
-    
-    game->progress = new_progress;
 }
 
 void gameCleanup(Game* game)
