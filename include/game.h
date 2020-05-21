@@ -1,3 +1,6 @@
+#ifndef GAME_H
+#define GAME_H
+
 #include <switch.h>
 
 typedef enum {
@@ -38,3 +41,5 @@ void gameStart(Game* game, Direction next);
 void gameSetNextDir(Game* game, Direction next);
 void gameUpdate(Game* game, float delta_time);
 void gameCleanup(Game* game);
+
+#endif
