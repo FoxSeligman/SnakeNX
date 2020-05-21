@@ -78,8 +78,8 @@ int main(int argc, char* argv[])
 
     // Create new game
     Game game;
-    game.settings.speed = 0.05f;
-    gameInit(&game);
+    gameInit(&game, GAME_COLUMNS, GAME_ROWS, 0.05f);
+
 
     // Time
     struct timeval lastTimestamp;

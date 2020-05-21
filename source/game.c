@@ -7,8 +7,12 @@ void blipInit(Blip* blip)
     blip->next = NULL;
 }
 
-void gameInit(Game* game)
+// void gameMoveLooseBlip(Game* game)
+void gameInit(Game* game, u32 columns, u32 rows, float speed)
 {
+    game->settings.columns = columns;
+    game->settings.rows = rows;
+    game->settings.speed = speed;
     game->has_started = false;
     
     blipInit(&game->root_blip);
@@ -19,10 +23,9 @@ void gameStart(Game* game, Direction starting_dir)
 {
     game->next_dir = starting_dir;
 
-    Blip* root_blip = &game->root_blip;
-    // TODO: Magic numbers
-    root_blip->column = root_blip->target_column = 40;
-    root_blip->row = root_blip->target_row = 22;
+    blipInit(&game->root_blip);
+    game->root_blip.column = game->root_blip.target_column = game->settings.columns / 2;
+    game->root_blip.row = game->root_blip.target_row = game->settings.rows / 2;
 
     game->progress = 1;
 

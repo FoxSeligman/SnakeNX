@@ -18,6 +18,8 @@ typedef struct Blip {
 
 /// Game settings structure.
 typedef struct Settings {
+    int columns;
+    int rows;
     float speed;    // Seconds per cell
 } Settings;
 
@@ -30,7 +32,7 @@ typedef struct Game {
     Direction next_dir;
 } Game;
 
-void gameInit(Game* game);
+void gameInit(Game* game, u32 columns, u32 rows, float speed);
 void gameStart(Game* game, Direction next);
 void gameSetNextDir(Game* game, Direction next);
 void gameUpdate(Game* game, float delta_time);
