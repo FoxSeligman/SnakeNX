@@ -147,7 +147,7 @@ int main(int argc, char* argv[])
             for (u32 x = 0; x < FB_WIDTH; x ++)
             {
                 u32 pos = y * stride / sizeof(u32) + x;
-                framebuf[pos] = 0;
+                framebuf[pos] = (game.has_started ? 0 : 0xFF333333);
             }
         }
 

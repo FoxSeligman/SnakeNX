@@ -3,16 +3,8 @@
 
 #include <switch.h>
 
+#include "blip.h"
 #include "utility.h"
-
-/// Blip structure.
-typedef struct Blip {
-    u32 target_column;
-    u32 target_row;
-    u32 column;
-    u32 row;
-    struct Blip* next;
-} Blip;
 
 /// Game structure.
 typedef struct Game {
