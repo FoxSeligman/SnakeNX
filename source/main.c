@@ -151,7 +151,9 @@ int main(int argc, char* argv[])
             }
         }
 
-        renderBlip(&game, &game.root_blip, framebuf, stride);
+        for (Blip* blip = &game.root_blip; blip != NULL; blip = blip->next)
+            renderBlip(&game, blip, framebuf, stride);
+        renderBlip(&game, &game.loose_blip, framebuf, stride);
         
         // We're done rendering, so we end the frame here.
         framebufferEnd(&fb);

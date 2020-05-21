@@ -28,6 +28,7 @@ typedef struct Game {
     Settings settings;
     bool has_started;
     Blip root_blip;
+    Blip loose_blip;
     float progress;
     Direction next_dir;
 } Game;
