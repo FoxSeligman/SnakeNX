@@ -2,9 +2,11 @@
 
 #include <stdlib.h>
 
-void blipInit(Blip* blip)
+void blipInit(Blip* blip, u32 column, u32 row)
 {
     blip->next = NULL;
+    blip->column = blip->target_column = column;
+    blip->row = blip->target_row = row;
 }
 
 // void gameMoveLooseBlip(Game* game)
@@ -15,7 +17,8 @@ void gameInit(Game* game, u32 columns, u32 rows, float speed)
     game->settings.speed = speed;
     game->has_started = false;
     
-    blipInit(&game->root_blip);
+    // time_t t;
+    blipInit(&game->root_blip, game->settings.columns / 2, game->settings.rows / 2);
 }
 
 // Blip* getLastBlip(Blip* blip)
@@ -23,9 +26,7 @@ void gameStart(Game* game, Direction starting_dir)
 {
     game->next_dir = starting_dir;
 
-    blipInit(&game->root_blip);
-    game->root_blip.column = game->root_blip.target_column = game->settings.columns / 2;
-    game->root_blip.row = game->root_blip.target_row = game->settings.rows / 2;
+    blipInit(&game->root_blip, game->settings.columns / 2, game->settings.rows / 2);
 
     game->progress = 1;
 
