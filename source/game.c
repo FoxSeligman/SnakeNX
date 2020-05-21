@@ -14,7 +14,8 @@ void gameInit(Game* game)
     blipInit(&game->root_blip);
 }
 
-void gameBegin(Game* game, Direction starting_dir)
+// Blip* getLastBlip(Blip* blip)
+void gameStart(Game* game, Direction starting_dir)
 {
     game->next_dir = starting_dir;
 

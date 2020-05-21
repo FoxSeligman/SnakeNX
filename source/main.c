@@ -101,7 +101,7 @@ int main(int argc, char* argv[])
         Direction nextDir;
         if (determineDirection(&nextDir, kDown)) {
             if (!game.has_started) {
-                gameBegin(&game, nextDir);
+                gameStart(&game, nextDir);
             } else {
                 gameSetNextDir(&game, nextDir);
             }
