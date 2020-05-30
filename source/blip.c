@@ -39,7 +39,6 @@ void blipSetNextTargets(Blip* blip, Direction next)
     case DIR_DOWN:
     default:
         target_row -= 1;
-        blip->target_row = blip->row - 1;
     }
 
     blipSetNextTargetsRecursive(blip, target_column, target_row);
