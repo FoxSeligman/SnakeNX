@@ -50,19 +50,16 @@ bool determineDirection(Direction* dir, u64 kDown)
 
 void renderBlip(Game* game, Blip* blip, u32* framebuf, u32 stride)
 {
-    double blip_cell_y = game->progress * (blip->target_row - blip->row) + blip->row;
-    double blip_cell_x = game->progress * (blip->target_column - blip->column) + blip->column;
+    float blip_cell_y = game->progress * ((float)blip->target_row - blip->row) + blip->row;
+    float blip_cell_x = game->progress * ((float)blip->target_column - blip->column) + blip->column;
 
-    blip_cell_y = blip->row;
-    blip_cell_x = blip->column;
-
-    u32 blip_y = (int)(FB_HEIGHT - blip_cell_y * CELL_SIZE);    // Flip vertically
-    u32 blip_x = (int)(blip_cell_x * CELL_SIZE);
+    u32 blip_screen_y = (int)(FB_HEIGHT - blip_cell_y * CELL_SIZE);    // Flip vertically
+    u32 blip_screen_x = (int)(blip_cell_x * CELL_SIZE);
 
     // Each pixel is 4-bytes due to RGBA8888.
-    for (u32 y = blip_y - CELL_SIZE_HALF; y < blip_y + CELL_SIZE_HALF && y >= 0 && y < FB_HEIGHT; y ++)
+    for (u32 y = blip_screen_y - CELL_SIZE_HALF; y < blip_screen_y + CELL_SIZE_HALF && y >= 0 && y < FB_HEIGHT; y ++)
     {
-        for (u32 x = blip_x - CELL_SIZE_HALF; x < blip_x + CELL_SIZE_HALF && x >= 0 && x < FB_WIDTH; x ++)
+        for (u32 x = blip_screen_x - CELL_SIZE_HALF; x < blip_screen_x + CELL_SIZE_HALF && x >= 0 && x < FB_WIDTH; x ++)
         {
             u32 pos = y * stride / sizeof(u32) + x;
 #ifdef DISPLAY_IMAGE
