@@ -73,9 +73,10 @@ void gameUpdate(Game* game, float delta_time)
     if (game->has_started) {
         float new_progress = game->progress + delta_time / game->settings.speed;
         if (new_progress >= 1) {
-            gameCheckEatBlip(game);
             blipSetNextTargets(&game->root_blip, game->next_dir);
             new_progress -= 1;
+
+            gameCheckEatBlip(game);
         }
         
         game->progress = new_progress;
