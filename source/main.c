@@ -131,10 +131,7 @@ int main(int argc, char* argv[])
             }
         }
 
-        getDeltaTime(&deltaTime, &lastTimestamp);
-        gameUpdate(&game, deltaTime);
-
-        // Retrieve the framebuffer
+        // Retrieve the framebuffer. Must do before any rendering is done
         u32 stride;
         u32* framebuf = (u32*) framebufferBegin(&fb, &stride);
 
@@ -147,6 +144,9 @@ int main(int argc, char* argv[])
                 framebuf[pos] = (game.has_started ? 0 : 0xFF333333);
             }
         }
+
+        getDeltaTime(&deltaTime, &lastTimestamp);
+        gameUpdate(&game, deltaTime);
 
         for (Blip* blip = &game.root_blip; blip != NULL; blip = blip->next)
             renderBlip(&game, blip, framebuf, stride);
