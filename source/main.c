@@ -10,6 +10,7 @@
 #include <switch.h>
 
 #include "game.h"
+#include "utility.h"
 
 #ifdef DISPLAY_IMAGE
 #include "image_bin.h"//Your own raw RGB888 1280x720 image at "data/image.bin" is required.
@@ -30,7 +31,6 @@
 
 #define CELL_SIZE FB_WIDTH / GAME_COLUMNS
 #define CELL_SIZE_HALF CELL_SIZE / 2
-
 
 bool determineDirection(Direction* dir, u64 kDown)
 {
