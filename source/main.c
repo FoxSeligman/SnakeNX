@@ -48,8 +48,9 @@ bool determineDirection(Direction* dir, u64 kDown)
     return true;
 }
 
-void renderBlip(Game* game, Blip* blip, u32* framebuf, u32 stride)
+void renderBlip(Game* game, Framebuffer fb, Blip* blip)
 {
+    u32* framebuf = (u32*) fb.buf_linear;
     float blip_cell_y = game->progress * ((float)blip->target_row - blip->row) + blip->row;
     float blip_cell_x = game->progress * ((float)blip->target_column - blip->column) + blip->column;
 
@@ -61,7 +62,7 @@ void renderBlip(Game* game, Blip* blip, u32* framebuf, u32 stride)
     {
         for (u32 x = blip_screen_x - CELL_SIZE_HALF; x < blip_screen_x + CELL_SIZE_HALF && x >= 0 && x < FB_WIDTH; x ++)
         {
-            u32 pos = y * stride / sizeof(u32) + x;
+            u32 pos = y * fb.stride / sizeof(u32) + x;
 #ifdef DISPLAY_IMAGE
             framebuf[pos] = RGBA8_MAXALPHA(imageptr[pos*3+0]+(cnt*4), imageptr[pos*3+1], imageptr[pos*3+2]);
 #else
@@ -149,9 +150,9 @@ int main(int argc, char* argv[])
         gameUpdate(&game, deltaTime);
 
         for (Blip* blip = &game.root_blip; blip != NULL; blip = blip->next)
-            renderBlip(&game, blip, framebuf, stride);
-        renderBlip(&game, &game.loose_blip, framebuf, stride);
-        
+            renderBlip(&game, fb, blip);
+        renderBlip(&game, fb, &game.loose_blip);
+
         // We're done rendering, so we end the frame here.
         framebufferEnd(&fb);
     }
