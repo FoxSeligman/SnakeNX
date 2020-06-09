@@ -58,12 +58,15 @@ void gameCheckEatBlip(Game* game)
 {
     Blip* root_blip = &game->root_blip;
     Blip* loose_blip = &game->loose_blip;
-    if (root_blip->target_column == loose_blip->column &&
-        root_blip->target_row == loose_blip->row) {
-            Blip* new_blip = (Blip*)malloc(sizeof(Blip));
-            blipInit(new_blip, loose_blip->column, loose_blip->row);
+    if (root_blip->column == loose_blip->column &&
+        root_blip->row == loose_blip->row) {
+            Blip* last_blip = getLastBlip(root_blip);
 
-            getLastBlip(root_blip)->next = new_blip;
+            // Make new blip and add to the end of the snake™
+            Blip* new_blip = (Blip*)malloc(sizeof(Blip));
+            blipInit(new_blip, last_blip->column, last_blip->row);
+            last_blip->next = new_blip;
+            
             gameMoveLooseBlip(game);
         }
 }
