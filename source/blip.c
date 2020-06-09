@@ -11,14 +11,14 @@ void blipInit(Blip* blip, u32 column, u32 row)
 
 void blipSetNextTargetsRecursive(Blip* blip, u32 target_column, u32 target_row)
 {
-    if (blip->next)
-        blipSetNextTargetsRecursive(blip->next, blip->column, blip->row);
-
     blip->column = blip->target_column;
     blip->row = blip->target_row;
 
     blip->target_column = target_column;
     blip->target_row = target_row;
+
+    if (blip->next)
+        blipSetNextTargetsRecursive(blip->next, blip->column, blip->row);
 }
 
 void blipSetNextTargets(Blip* blip, Direction next)
