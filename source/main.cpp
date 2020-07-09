@@ -50,7 +50,7 @@ bool determineDirection(Direction* dir, Uint8 button)
     return true;
 }
 
-void renderBlip(Game* game, SDL_Renderer* renderer, Blip* blip)
+void renderBlip(Game* game, SDL_Renderer* renderer, SDL_Texture* t_blip, Blip* blip)
 {
     float blip_cell_y = game->progress * ((float)blip->target_row - blip->row) + blip->row;
     float blip_cell_x = game->progress * ((float)blip->target_column - blip->column) + blip->column;
@@ -59,7 +59,7 @@ void renderBlip(Game* game, SDL_Renderer* renderer, Blip* blip)
     int blip_screen_x = (int)(blip_cell_x * CELL_SIZE);
 
     SDL_Rect rect = { blip_screen_x - CELL_SIZE_HALF, blip_screen_y - CELL_SIZE_HALF, CELL_SIZE, CELL_SIZE };
-    SDL_RenderFillRect(renderer, &rect);
+    SDL_RenderCopy(renderer, t_blip, NULL, &rect);
 }
 
 // TODO: Not implied that last_timestamp will update
@@ -75,13 +75,18 @@ void getDeltaTime(float* out_delta_time, struct timeval* last_timestamp)
     *last_timestamp = timestamp;
 }
 
+SDL_Texture* loadImage(SDL_Renderer* renderer, const char* path) {
+    SDL_Surface *surface = IMG_Load(path);
+    SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, surface);
+    SDL_FreeSurface(surface);
+    return texture;
+}
+
 // Main program entrypoint
 int main(int argc, char** argv)
 {
     romfsInit();
     chdir("romfs:/");
-
-    SDL_Texture* t_bg = NULL;
 
     SDL_Init(SDL_INIT_VIDEO|SDL_INIT_TIMER);
     IMG_Init(IMG_INIT_PNG);
@@ -89,10 +94,10 @@ int main(int argc, char** argv)
     SDL_Window* window = SDL_CreateWindow("Snake NX", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, SCREEN_W, SCREEN_H, SDL_WINDOW_SHOWN);
     SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_SOFTWARE);
 
-    SDL_Surface *sdllogo = IMG_Load("img/t_bg.png");
-    t_bg = SDL_CreateTextureFromSurface(renderer, sdllogo);
-    SDL_FreeSurface(sdllogo);
+    SDL_Texture* t_bg = loadImage(renderer, "img/t_bg.png");
+    SDL_Texture* t_blip = loadImage(renderer, "img/t_blip.png");
 
+    
     // TODO: SDL_INIT_GAMECONTROLLER
     SDL_InitSubSystem(SDL_INIT_JOYSTICK);
     SDL_JoystickEventState(SDL_ENABLE);
@@ -144,8 +149,8 @@ int main(int argc, char** argv)
         SDL_SetRenderDrawColor(renderer, 0, 127, 255, 255);
         
         for (Blip* blip = &game.root_blip; blip != NULL; blip = blip->next)
-            renderBlip(&game, renderer, blip);
-        renderBlip(&game, renderer, &game.loose_blip);
+            renderBlip(&game, renderer, t_blip, blip);
+        renderBlip(&game, renderer, t_blip, &game.loose_blip);
 
         SDL_RenderPresent(renderer);
     }
