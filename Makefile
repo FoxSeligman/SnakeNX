@@ -42,14 +42,17 @@ BUILD		:=	build
 SOURCES		:=	source
 DATA		:=	data
 INCLUDES	:=	include
-#ROMFS	:=	romfs
+ROMFS		:=	romfs
+
+APP_TITLE   := Snake NX
+APP_AUTHOR  := Zira Fox
 
 #---------------------------------------------------------------------------------
 # options for code generation
 #---------------------------------------------------------------------------------
 ARCH	:=	-march=armv8-a+crc+crypto -mtune=cortex-a57 -mtp=soft -fPIE
 
-CFLAGS	:=	-g -Wall -O2 -ffunction-sections \
+CFLAGS	:=	`$(PREFIX)pkg-config --cflags sdl2 SDL2_image` -Wall -O2 -ffunction-sections \
 			$(ARCH) $(DEFINES)
 
 CFLAGS	+=	$(INCLUDE) -D__SWITCH__
@@ -59,7 +62,8 @@ CXXFLAGS	:= $(CFLAGS) -fno-rtti -fno-exceptions
 ASFLAGS	:=	-g $(ARCH)
 LDFLAGS	=	-specs=$(DEVKITPRO)/libnx/switch.specs -g $(ARCH) -Wl,-Map,$(notdir $*.map)
 
-LIBS	:= -lnx
+LIBS	:=	`$(PREFIX)pkg-config --libs sdl2 SDL2_image` \
+			-lnx
 
 #---------------------------------------------------------------------------------
 # list of directories containing libraries, this must be the top level containing

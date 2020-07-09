@@ -1,75 +1,65 @@
-// Include the most common headers from the C standard library
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include <unistd.h>
 
-// Include additional headers
+#include <SDL.h>
+#include <SDL_image.h>
 #include <sys/time.h>
 
-// Include the main libnx system header, for Switch development
 #include <switch.h>
 
 #include "game.h"
 #include "utility.h"
 
-#ifdef DISPLAY_IMAGE
-#include "image_bin.h"//Your own raw RGB888 1280x720 image at "data/image.bin" is required.
-#endif
-
-// See also libnx display/framebuffer.h.
+#define JOY_PLUS  10
+#define JOY_LEFT  12
+#define JOY_UP    13
+#define JOY_RIGHT 14
+#define JOY_DOWN  15
 
 // Define the desired framebuffer resolution (here we set it to 720p).
-#define FB_WIDTH  1280
-#define FB_HEIGHT 720
+#define SCREEN_W 1280
+#define SCREEN_H 720
 
 // Remove above and uncomment below for 1080p
-//#define FB_WIDTH  1920
-//#define FB_HEIGHT 1080
+//#define SCREEN_W  1920
+//#define SCREEN_H 1080
 
-#define GAME_COLUMNS 80
-#define GAME_ROWS 45    // FB_HEIGHT / FB_WIDTH * GAME_COLUMNS
+#define GAME_COLUMNS 40
+#define GAME_ROWS 22    // SCREEN_H / SCREEN_W * GAME_COLUMNS
 
-#define CELL_SIZE FB_WIDTH / GAME_COLUMNS
+#define CELL_SIZE SCREEN_W / GAME_COLUMNS
 #define CELL_SIZE_HALF CELL_SIZE / 2
 
-bool determineDirection(Direction* dir, u64 kDown)
+bool determineDirection(Direction* dir, Uint8 button)
 {
-    if (kDown & (KEY_LSTICK_LEFT | KEY_DLEFT)) {
-        *dir = DIR_LEFT;
-    } else if (kDown & (KEY_LSTICK_UP | KEY_DUP)) {
-        *dir = DIR_UP;
-    } else if (kDown & (KEY_LSTICK_RIGHT | KEY_DRIGHT)) {
-        *dir = DIR_RIGHT;
-    } else if (kDown & (KEY_LSTICK_DOWN | KEY_DDOWN)) {
-        *dir = DIR_DOWN;
-    } else {
-        return false;
+    switch (button) {
+        case JOY_LEFT:
+            *dir = DIR_LEFT;
+            break;
+        case JOY_UP:
+            *dir = DIR_UP;
+            break;
+        case JOY_RIGHT:
+            *dir = DIR_RIGHT;
+            break;
+        case JOY_DOWN:
+            *dir = DIR_DOWN;
+           break;
+        default:
+            return false;
     }
     return true;
 }
 
-void renderBlip(Game* game, Framebuffer fb, Blip* blip)
+void renderBlip(Game* game, SDL_Renderer* renderer, Blip* blip)
 {
-    u32* framebuf = (u32*) fb.buf_linear;
     float blip_cell_y = game->progress * ((float)blip->target_row - blip->row) + blip->row;
     float blip_cell_x = game->progress * ((float)blip->target_column - blip->column) + blip->column;
 
-    u32 blip_screen_y = (int)(FB_HEIGHT - blip_cell_y * CELL_SIZE);    // Flip vertically
-    u32 blip_screen_x = (int)(blip_cell_x * CELL_SIZE);
+    int blip_screen_y = (int)(SCREEN_H - blip_cell_y * CELL_SIZE);    // Flip vertically
+    int blip_screen_x = (int)(blip_cell_x * CELL_SIZE);
 
-    // Each pixel is 4-bytes due to RGBA8888.
-    for (u32 y = blip_screen_y - CELL_SIZE_HALF; y < blip_screen_y + CELL_SIZE_HALF && y >= 0 && y < FB_HEIGHT; y ++)
-    {
-        for (u32 x = blip_screen_x - CELL_SIZE_HALF; x < blip_screen_x + CELL_SIZE_HALF && x >= 0 && x < FB_WIDTH; x ++)
-        {
-            u32 pos = y * fb.stride / sizeof(u32) + x;
-#ifdef DISPLAY_IMAGE
-            framebuf[pos] = RGBA8_MAXALPHA(imageptr[pos*3+0]+(cnt*4), imageptr[pos*3+1], imageptr[pos*3+2]);
-#else
-            framebuf[pos] = 0xFFFFFFFF;//Set framebuf to white
-#endif
-        }
-    }
+    SDL_Rect rect = { blip_screen_x - CELL_SIZE_HALF, blip_screen_y - CELL_SIZE_HALF, CELL_SIZE, CELL_SIZE };
+    SDL_RenderFillRect(renderer, &rect);
 }
 
 // TODO: Not implied that last_timestamp will update
@@ -86,24 +76,31 @@ void getDeltaTime(float* out_delta_time, struct timeval* last_timestamp)
 }
 
 // Main program entrypoint
-int main(int argc, char* argv[])
+int main(int argc, char** argv)
 {
-    // Retrieve the default window
-    NWindow* win = nwindowGetDefault();
+    romfsInit();
+    chdir("romfs:/");
 
-    // Create a linear double-buffered framebuffer
-    Framebuffer fb;
-    framebufferCreate(&fb, win, FB_WIDTH, FB_HEIGHT, PIXEL_FORMAT_RGBA_8888, 2);
-    framebufferMakeLinear(&fb);
+    SDL_Texture* t_bg = NULL;
 
-#ifdef DISPLAY_IMAGE
-    u8* imageptr = (u8*)image_bin;
-#endif
+    SDL_Init(SDL_INIT_VIDEO|SDL_INIT_TIMER);
+    IMG_Init(IMG_INIT_PNG);
+
+    SDL_Window* window = SDL_CreateWindow("Snake NX", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, SCREEN_W, SCREEN_H, SDL_WINDOW_SHOWN);
+    SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_SOFTWARE);
+
+    SDL_Surface *sdllogo = IMG_Load("img/t_bg.png");
+    t_bg = SDL_CreateTextureFromSurface(renderer, sdllogo);
+    SDL_FreeSurface(sdllogo);
+
+    // TODO: SDL_INIT_GAMECONTROLLER
+    SDL_InitSubSystem(SDL_INIT_JOYSTICK);
+    SDL_JoystickEventState(SDL_ENABLE);
+    SDL_JoystickOpen(0);
 
     // Create new game
     Game game;
     gameInit(&game, GAME_COLUMNS, GAME_ROWS, 0.05f);
-
 
     // Time
     struct timeval lastTimestamp;
@@ -111,54 +108,53 @@ int main(int argc, char* argv[])
     getDeltaTime(&deltaTime, &lastTimestamp);   // Initialize values
 
     // Main loop
-    while (appletMainLoop())
+    SDL_Event event;
+    bool exit_requested = false;
+    while (appletMainLoop() && !exit_requested)
     {
-        // Scan all the inputs. This should be done once for each frame
-        hidScanInput();
+        while (SDL_PollEvent(&event)) {
+            if (event.type == SDL_QUIT)
+                exit_requested = true;
 
-        // hidKeysDown returns information about which buttons have been
-        // just pressed in this frame compared to the previous one
-        u64 kDown = hidKeysDown(CONTROLLER_P1_AUTO);
+            if (event.type == SDL_JOYBUTTONDOWN) {
+                printf("%d\n",event.jbutton.button);
+                if (event.jbutton.button == JOY_PLUS)
+                    exit_requested = true;
 
-        if (kDown & KEY_PLUS)
-            break; // break in order to return to hbmenu
-
-        Direction nextDir;
-        if (determineDirection(&nextDir, kDown)) {
-            if (!game.has_started) {
-                gameStart(&game, nextDir);
-            } else {
-                gameSetNextDir(&game, nextDir);
+                Direction nextDir;
+                if (determineDirection(&nextDir, event.jbutton.button)) {
+                    if (!game.has_started) {
+                        gameStart(&game, nextDir);
+                    } else {
+                        gameSetNextDir(&game, nextDir);
+                    }
+                }
             }
         }
 
-        // Retrieve the framebuffer. Must do before any rendering is done
-        u32 stride;
-        u32* framebuf = (u32*) framebufferBegin(&fb, &stride);
-
-        // Black out framebuffer TODO: Quick and dirty
-        for (u32 y = 0; y < FB_HEIGHT; y ++)
-        {
-            for (u32 x = 0; x < FB_WIDTH; x ++)
-            {
-                u32 pos = y * stride / sizeof(u32) + x;
-                framebuf[pos] = (game.has_started ? 0 : 0xFF333333);
-            }
-        }
+        // TODO: Can render just a part of it
+        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+        SDL_RenderClear(renderer);
+        SDL_RenderCopy(renderer, t_bg, NULL, NULL);
 
         getDeltaTime(&deltaTime, &lastTimestamp);
         gameUpdate(&game, deltaTime);
 
-        for (Blip* blip = &game.root_blip; blip != NULL; blip = blip->next)
-            renderBlip(&game, fb, blip);
-        renderBlip(&game, fb, &game.loose_blip);
 
-        // We're done rendering, so we end the frame here.
-        framebufferEnd(&fb);
+        SDL_SetRenderDrawColor(renderer, 0, 127, 255, 255);
+        
+        for (Blip* blip = &game.root_blip; blip != NULL; blip = blip->next)
+            renderBlip(&game, renderer, blip);
+        renderBlip(&game, renderer, &game.loose_blip);
+
+        SDL_RenderPresent(renderer);
     }
 
     gameCleanup(&game);
-    framebufferClose(&fb);
+
+    IMG_Quit();
+    SDL_Quit();
+    romfsExit();
 
     return 0;
 }
