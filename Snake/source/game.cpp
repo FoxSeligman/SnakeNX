@@ -3,9 +3,13 @@
 #include <stdlib.h>
 #include <time.h>
 
-void gameMoveLooseBlip(Game* game)
+#include <stdio.h>
+
+void gameMakeLooseBlip(Game* game)
 {
-    blipInit(&game->loose_blip, rand() % game->settings.columns, rand() % game->settings.rows);
+    int x = rand() % game->settings.columns;
+    int y = rand() % game->settings.rows;
+    game->loose_blip = std::make_shared<Blip>(Cell{x, y});
 }
 
 // What the game should look like before the first move is made
@@ -20,21 +24,13 @@ void gameInit(Game* game, u32 columns, u32 rows, float speed)
     time_t t;
     srand((unsigned) time(&t));
     
-    blipInit(&game->root_blip, game->settings.columns / 2, game->settings.rows / 2);
-    blipInit(&game->loose_blip, 0, 0);
+    int x = game->settings.columns / 2;
+    int y = game->settings.rows / 2;
+    
+    game->root_blip = game->last_blip = std::make_shared<Blip>(Cell{x, y});
+    game->loose_blip = std::make_shared<Blip>(Cell{0, 0});
+
     game->progress = 1;
-}
-
-Blip* getLastBlip(Blip* blip)
-{
-    if (blip == NULL)
-        return NULL;
-
-    Blip* last_blip = blip;
-    while (last_blip->next != NULL)
-        last_blip = last_blip->next;
-
-    return last_blip;
 }
 
 // What the game should look like as soon as the first move is made
@@ -42,7 +38,7 @@ void gameStart(Game* game, Direction starting_dir)
 {
     game->next_dir = starting_dir;
 
-    gameMoveLooseBlip(game);
+    gameMakeLooseBlip(game);
 
     game->has_started = true;
 }
@@ -56,27 +52,23 @@ void gameSetNextDir(Game* game, Direction next)
 
 void gameCheckEatBlip(Game* game)
 {
-    Blip* root_blip = &game->root_blip;
-    Blip* loose_blip = &game->loose_blip;
-    if (root_blip->column == loose_blip->column &&
-        root_blip->row == loose_blip->row) {
-            Blip* last_blip = getLastBlip(root_blip);
+    if (game->root_blip->cell == game->loose_blip->cell) {
+        // Add loose blip to the end of the snake and make new loose blip
+        game->last_blip->next = game->loose_blip;
+        game->last_blip = game->loose_blip;
 
-            // Make new blip and add to the end of the snake™
-            Blip* new_blip = (Blip*)malloc(sizeof(Blip));
-            blipInit(new_blip, last_blip->column, last_blip->row);
-            last_blip->next = new_blip;
-            
-            gameMoveLooseBlip(game);
-        }
+        gameMakeLooseBlip(game);
+    }
 }
 
 void gameUpdate(Game* game, float delta_time)
 {
+
     if (game->has_started) {
+        // TODO: Line too long
         float new_progress = game->progress + delta_time / game->settings.speed;
         if (new_progress >= 1) {
-            blipSetNextTargets(&game->root_blip, game->next_dir);
+            game->root_blip->setNextTargets(game->next_dir);
             new_progress -= 1;
 
             gameCheckEatBlip(game);
@@ -88,6 +80,5 @@ void gameUpdate(Game* game, float delta_time)
 
 void gameCleanup(Game* game)
 {
-    if (game->root_blip.next)
-        blipDeleteRecursive(game->root_blip.next);
+    
 }

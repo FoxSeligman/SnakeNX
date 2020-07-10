@@ -1,53 +1,45 @@
-#include "blip.h"
+#include "blip.hpp"
 
 #include <stdlib.h>
 
-void blipInit(Blip* blip, u32 column, u32 row)
+Blip::Blip(Cell cell)
 {
-    blip->next = NULL;
-    blip->column = blip->target_column = column;
-    blip->row = blip->target_row = row;
+    setCell(cell);
 }
 
-void blipSetNextTargetsRecursive(Blip* blip, u32 target_column, u32 target_row)
+void Blip::setCell(Cell cell)
 {
-    blip->column = blip->target_column;
-    blip->row = blip->target_row;
-
-    blip->target_column = target_column;
-    blip->target_row = target_row;
-
-    if (blip->next)
-        blipSetNextTargetsRecursive(blip->next, blip->column, blip->row);
+    this->cell = this->target_cell = cell;
 }
 
-void blipSetNextTargets(Blip* blip, Direction next)
+void Blip::setNextTargetsRecursive(Cell target_cell)
 {
-    u32 target_column = blip->target_column;
-    u32 target_row = blip->target_row;
+    this->cell = this->target_cell;
+
+    this->target_cell = target_cell;
+
+    if (this->next)
+        this->next->setNextTargetsRecursive(this->cell);
+}
+
+void Blip::setNextTargets(Direction next)
+{
+    Cell target_cell = this->target_cell;
 
     switch(next) {
     case DIR_LEFT:
-        target_column -= 1;
+        target_cell.column -= 1;
         break;
     case DIR_UP:
-        target_row += 1;
+        target_cell.row += 1;
         break;
     case DIR_RIGHT:
-        target_column += 1;
+        target_cell.column += 1;
         break;
     case DIR_DOWN:
     default:
-        target_row -= 1;
+        target_cell.row -= 1;
     }
 
-    blipSetNextTargetsRecursive(blip, target_column, target_row);
-}
-
-void blipDeleteRecursive(Blip* blip)
-{
-    if (blip->next)
-        blipDeleteRecursive(blip->next);
-
-    free(blip);
+    setNextTargetsRecursive(target_cell);
 }

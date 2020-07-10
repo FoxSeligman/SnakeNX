@@ -1,17 +1,18 @@
 #ifndef GAME_H
 #define GAME_H
 
+#include <memory>
+
 #include <switch.h>
 
-#include "blip.h"
+#include "blip.hpp"
 #include "utility.h"
 
 /// Game structure.
 typedef struct Game {
     Settings settings;
     bool has_started;
-    Blip root_blip;
-    Blip loose_blip;
+    std::shared_ptr<Blip> root_blip, last_blip, loose_blip;
     float progress;
     Direction next_dir;
 } Game;
