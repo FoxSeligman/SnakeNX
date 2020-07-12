@@ -1,5 +1,5 @@
-#include <sb/Entity.hpp>
+#include <atmy/Entity.hpp>
 
-namespace sb {
+namespace atmy {
 
 }

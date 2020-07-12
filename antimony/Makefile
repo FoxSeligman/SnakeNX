@@ -14,10 +14,10 @@ include $(DEVKITPRO)/libnx/switch_rules
 # DATA is a list of directories containing data files
 # INCLUDES is a list of directories containing header files
 #---------------------------------------------------------------------------------
-TARGET		:=	sb
-SOURCES		:=	source source/sb
+TARGET		:=	atmy
+SOURCES		:=	source source/atmy
 DATA		:=	data
-INCLUDES	:= include include/sb
+INCLUDES	:= include include/atmy
 
 #---------------------------------------------------------------------------------
 # options for code generation
