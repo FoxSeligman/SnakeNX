@@ -6,7 +6,7 @@
 
 #include <switch.h>
 
-#include "game.h"
+#include "game.hpp"
 #include "utility.h"
 
 #define JOY_PLUS  10
@@ -52,8 +52,8 @@ bool determineDirection(Direction* dir, Uint8 button)
 
 void renderBlip(Game* game, SDL_Renderer* renderer, SDL_Texture* t_blip, Blip* blip)
 {
-    float blip_cell_y = game->progress * ((float)blip->target_cell.row - blip->cell.row) + blip->cell.row;
-    float blip_cell_x = game->progress * ((float)blip->target_cell.column - blip->cell.column) + blip->cell.column;
+    float blip_cell_y = game->get_progress() * ((float)blip->target_cell.row - blip->cell.row) + blip->cell.row;
+    float blip_cell_x = game->get_progress() * ((float)blip->target_cell.column - blip->cell.column) + blip->cell.column;
 
     int blip_screen_y = (int)(SCREEN_H - blip_cell_y * CELL_SIZE);    // Flip vertically
     int blip_screen_x = (int)(blip_cell_x * CELL_SIZE);
@@ -104,8 +104,7 @@ int main(int argc, char** argv)
     SDL_JoystickOpen(0);
 
     // Create new game
-    Game game;
-    gameInit(&game, GAME_COLUMNS, GAME_ROWS, 0.05f);
+    Game* game = new Game(GAME_COLUMNS, GAME_ROWS, 0.05f);
 
     // Time
     struct timeval lastTimestamp;
@@ -128,10 +127,10 @@ int main(int argc, char** argv)
 
                 Direction nextDir;
                 if (determineDirection(&nextDir, event.jbutton.button)) {
-                    if (!game.has_started) {
-                        gameStart(&game, nextDir);
+                    if (!game->has_started) {
+                        game->Start(nextDir);
                     } else {
-                        gameSetNextDir(&game, nextDir);
+                        game->RequestNextDir(nextDir);
                     }
                 }
             }
@@ -143,19 +142,19 @@ int main(int argc, char** argv)
         SDL_RenderCopy(renderer, t_bg, NULL, NULL);
 
         getDeltaTime(&deltaTime, &lastTimestamp);
-        gameUpdate(&game, deltaTime);
+        game->Update(deltaTime);
 
 
         SDL_SetRenderDrawColor(renderer, 0, 127, 255, 255);
         
-        for (auto blip = game.root_blip.get(); blip != nullptr; blip = blip->next.get())
-            renderBlip(&game, renderer, t_blip, blip);
-        renderBlip(&game, renderer, t_blip, game.loose_blip.get());
+        for (auto blip = game->root_blip.get(); blip != nullptr; blip = blip->next.get())
+            renderBlip(game, renderer, t_blip, blip);
+        renderBlip(game, renderer, t_blip, game->loose_blip.get());
 
         SDL_RenderPresent(renderer);
     }
 
-    gameCleanup(&game);
+    delete game;
 
     IMG_Quit();
     SDL_Quit();
