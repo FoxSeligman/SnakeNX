@@ -6,8 +6,7 @@
 #include <stdio.h>
 
 // What the game should look like before the first move is made
-Game::Game(u32 columns, u32 rows, float speed)
-{
+Game::Game(u32 columns, u32 rows, float speed) {
     this->has_started = false;
     
     this->settings.columns = columns;
@@ -27,8 +26,7 @@ Game::Game(u32 columns, u32 rows, float speed)
 }
 
 // What the game should look like as soon as the first move is made
-void Game::Start(Direction starting_dir)
-{
+void Game::Start(Direction starting_dir) {
     this->set_next_dir(starting_dir);
 
     MakeLooseBlip();
@@ -36,9 +34,7 @@ void Game::Start(Direction starting_dir)
     this->has_started = true;
 }
 
-void Game::Update(float delta_time)
-{
-
+void Game::Update(float delta_time) {
     if (this->has_started) {
         // TODO: Line too long
         float new_progress = this->get_progress() + delta_time / this->settings.speed;
@@ -59,8 +55,7 @@ void Game::RequestNextDir(Direction next) {
         this->set_next_dir(next);
 }
 
-void Game::CheckEatBlip()
-{
+void Game::CheckEatBlip() {
     if (this->root_blip->cell == this->loose_blip->cell) {
         // Add loose blip to the end of the snake and make new loose blip
         this->last_blip->next = this->loose_blip;
@@ -70,8 +65,7 @@ void Game::CheckEatBlip()
     }
 }
 
-void Game::MakeLooseBlip()
-{
+void Game::MakeLooseBlip() {
     int x = rand() % this->settings.columns;
     int y = rand() % this->settings.rows;
     this->loose_blip = std::make_shared<Blip>(Cell{x, y});

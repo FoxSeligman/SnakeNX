@@ -29,8 +29,7 @@
 #define CELL_SIZE SCREEN_W / GAME_COLUMNS
 #define CELL_SIZE_HALF CELL_SIZE / 2
 
-bool determineDirection(Direction* dir, Uint8 button)
-{
+bool determineDirection(Direction* dir, Uint8 button) {
     switch (button) {
         case JOY_LEFT:
             *dir = DIR_LEFT;
@@ -50,8 +49,7 @@ bool determineDirection(Direction* dir, Uint8 button)
     return true;
 }
 
-void renderBlip(Game* game, SDL_Renderer* renderer, SDL_Texture* t_blip, Blip* blip)
-{
+void renderBlip(Game* game, SDL_Renderer* renderer, SDL_Texture* t_blip, Blip* blip) {
     float blip_cell_y = game->get_progress() * ((float)blip->target_cell.row - blip->cell.row) + blip->cell.row;
     float blip_cell_x = game->get_progress() * ((float)blip->target_cell.column - blip->cell.column) + blip->cell.column;
 
@@ -63,8 +61,7 @@ void renderBlip(Game* game, SDL_Renderer* renderer, SDL_Texture* t_blip, Blip* b
 }
 
 // TODO: Not implied that last_timestamp will update
-void getDeltaTime(float* out_delta_time, struct timeval* last_timestamp) 
-{
+void getDeltaTime(float* out_delta_time, struct timeval* last_timestamp) {
     struct timeval timestamp;
     gettimeofday(&timestamp, NULL);
 
@@ -83,7 +80,7 @@ SDL_Texture* loadImage(SDL_Renderer* renderer, const char* path) {
 }
 
 // Main program entrypoint
-int main(int argc, char** argv)
+int main(int argc, char** argv) {
 {
     romfsInit();
     chdir("romfs:/");

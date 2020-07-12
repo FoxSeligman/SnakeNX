@@ -2,18 +2,15 @@
 
 #include <stdlib.h>
 
-Blip::Blip(Cell cell)
-{
+Blip::Blip(Cell cell) {
     setCell(cell);
 }
 
-void Blip::setCell(Cell cell)
-{
+void Blip::setCell(Cell cell) {
     this->cell = this->target_cell = cell;
 }
 
-void Blip::setNextTargetsRecursive(Cell target_cell)
-{
+void Blip::setNextTargetsRecursive(Cell target_cell) {
     this->cell = this->target_cell;
 
     this->target_cell = target_cell;
@@ -22,8 +19,7 @@ void Blip::setNextTargetsRecursive(Cell target_cell)
         this->next->setNextTargetsRecursive(this->cell);
 }
 
-void Blip::setNextTargets(Direction next)
-{
+void Blip::setNextTargets(Direction next) {
     Cell target_cell = this->target_cell;
 
     switch(next) {
