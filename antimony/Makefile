@@ -24,7 +24,8 @@ INCLUDES	:= include include/atmy
 #---------------------------------------------------------------------------------
 ARCH	:=	-march=armv8-a+crc+crypto -mtune=cortex-a57 -mtp=soft -fPIE
 
-CFLAGS	:=	-g -Wall -Wno-error \
+CFLAGS	:=	`$(PREFIX)pkg-config --cflags sdl2 SDL2_image` \
+			-g -Wall -Wno-error \
 			-ffunction-sections \
 			-fdata-sections \
 			$(ARCH) \
@@ -35,6 +36,8 @@ CFLAGS	+=	$(INCLUDE) -D__SWITCH__
 CXXFLAGS	:= $(CFLAGS) -fno-rtti -fno-exceptions -std=gnu++20
 
 ASFLAGS	:=	-g $(ARCH)
+
+LIBS	:=	`$(PREFIX)pkg-config --libs sdl2 SDL2_image`
 
 #---------------------------------------------------------------------------------
 # list of directories containing libraries, this must be the top level containing

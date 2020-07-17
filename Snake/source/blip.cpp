@@ -1,6 +1,7 @@
 #include "blip.hpp"
 
 #include <stdlib.h>
+#include <stdio.h>
 
 Blip::Blip(Cell cell) {
     setCell(cell);
