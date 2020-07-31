@@ -1,5 +1,7 @@
 #pragma once
 
+#include <SDL.h>
+
 namespace atmy {
 
 class Game {
@@ -14,7 +16,8 @@ public:
 private:
     virtual void OnFrame(float delta_seconds) = 0;
 
-    float last_time;
+    // Controller input events
+    Uint32 last_frame_timestamp_;
     bool exit_requested_ = false;
 };
 

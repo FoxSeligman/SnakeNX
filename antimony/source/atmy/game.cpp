@@ -10,12 +10,12 @@ namespace atmy {
 
 bool Game::Update() {
     // Calculate delta time in seconds
-    Uint32 thisTime = SDL_GetTicks();
-    float deltaTime = (thisTime - this->last_time)/1000.0f;
-    this->last_time = thisTime;
+    Uint32 now = SDL_GetTicks();
+    float delta_time = (now - this->last_frame_timestamp_)/1000.0f;
+    this->last_frame_timestamp_ = now;
 
     // Run child-defined update
-    this->OnFrame(deltaTime);
+    this->OnFrame(delta_time);
 
     return appletMainLoop() && !this->exit_requested_;
 }
