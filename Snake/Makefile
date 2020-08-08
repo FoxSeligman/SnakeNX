@@ -52,7 +52,9 @@ APP_AUTHOR  := Zira Fox
 #---------------------------------------------------------------------------------
 ARCH	:=	-march=armv8-a+crc+crypto -mtune=cortex-a57 -mtp=soft -fPIE
 
-CFLAGS	:=	`$(PREFIX)pkg-config --cflags sdl2 SDL2_image` -Wall -O2 -ffunction-sections \
+CFLAGS	:=	`$(PREFIX)pkg-config --cflags sdl2 SDL2_image` \
+			-Wall -Wextra -pedantic -O2 \
+			-ffunction-sections \
 			$(ARCH) $(DEFINES)
 
 CFLAGS	+=	$(INCLUDE) -D__SWITCH__
@@ -84,7 +86,7 @@ export OUTPUT	:=	$(CURDIR)/$(TARGET)
 export TOPDIR	:=	$(CURDIR)
 
 export VPATH	:=	$(foreach dir,$(SOURCES),$(CURDIR)/$(dir)) \
-			$(foreach dir,$(DATA),$(CURDIR)/$(dir))
+					$(foreach dir,$(DATA),$(CURDIR)/$(dir))
 
 export DEPSDIR	:=	$(CURDIR)/$(BUILD)
 
