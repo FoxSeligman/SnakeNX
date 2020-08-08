@@ -1,18 +1,14 @@
 #pragma once
 
-#include <memory>
-
-#include <switch.h>
-
 #include <antimony>
 
 #include "blip.hpp"
-#include "utility.h"
+#include "utility.hpp"
 
 // TODO: Indents should be 2 spaces
-class SnakeGame : public atmy::Game {
+class SnakeGame : public atmy::Game, public atmy::Controller {
 public:
-    SnakeGame(u32 columns, u32 rows, float speed);
+    SnakeGame(int columns, int rows, float speed);
     void Start(Direction next);
     void RequestNextDir(Direction next);
     
@@ -27,8 +23,10 @@ public:
 
 private:
     void OnFrame(float delta_seconds) override;
+    void OnButtonsDown(u64 buttons) override;
 
     void CheckEatBlip();
+    bool DetermineDirection(Direction* dir, u64 button);
     void MakeLooseBlip();
     inline void set_next_dir(Direction next) { next_dir_ = next; }
 

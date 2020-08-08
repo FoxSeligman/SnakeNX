@@ -2,9 +2,7 @@
 
 #include <memory>
 
-#include <switch.h>
-
-#include "utility.h"
+#include "utility.hpp"
 
 struct Cell {
     int column, row;

@@ -1,11 +1,11 @@
 #include "snake_game.hpp"
 
-#include <stdlib.h>
 #include <time.h>
 
 #include <SDL.h>
+#include <SDL_image.h>
 
-#include <stdio.h>
+// #include <stdio.h>
 
 // TODO
 #define SCREEN_W 1280
@@ -21,14 +21,8 @@
 #define CELL_SIZE SCREEN_W / GAME_COLUMNS
 #define CELL_SIZE_HALF CELL_SIZE / 2
 
-#define JOY_PLUS  10
-#define JOY_LEFT  12
-#define JOY_UP    13
-#define JOY_RIGHT 14
-#define JOY_DOWN  15
-
 // What the game should look like before the first move is made
-SnakeGame::SnakeGame(u32 columns, u32 rows, float speed) {
+SnakeGame::SnakeGame(int columns, int rows, float speed) {
     this->has_started = false;
     
     this->settings.columns = columns;
@@ -46,25 +40,12 @@ SnakeGame::SnakeGame(u32 columns, u32 rows, float speed) {
 
     this->set_progress(1);
 
-
-    // TODO: SDL_INIT_GAMECONTROLLER
-    // SDL_InitSubSystem(SDL_INIT_JOYSTICK);
-    SDL_InitSubSystem(SDL_INIT_EVERYTHING);
-    // SDL_JoystickEventState(SDL_ENABLE);
-    SDL_GameControllerEventState(SDL_ENABLE);
-    // SDL_JoystickOpen(0);
-    SDL_GameController* ctrl0 = SDL_GameControllerOpen(0);
-    SDL_Joystick* joy0 = SDL_GameControllerGetJoystick(ctrl0);
-    SDL_GameControllerSetPlayerIndex(ctrl0, 0);
-    SDL_GameController* ctrl1 = SDL_GameControllerOpen(1);
-    SDL_Joystick* joy1 = SDL_GameControllerGetJoystick(ctrl1);
-    SDL_GameControllerSetPlayerIndex(ctrl1, 1);
-
-    printf("Controller 0: %d\n", SDL_JoystickGetDeviceVendor(0));
-    printf("Controller 1: %d\n", SDL_JoystickGetDeviceVendor(1));
+    // This class will respond to controller inputs
+    RegisterController(this, CONTROLLER_P1_AUTO);      // TODO: Rename to PLAYER_1
 }
 
 // What the game should look like as soon as the first move is made
+// TODO: Make this part of the base Game's lifecycle hooks?
 void SnakeGame::Start(Direction starting_dir) {
     this->set_next_dir(starting_dir);
 
@@ -73,23 +54,18 @@ void SnakeGame::Start(Direction starting_dir) {
     this->has_started = true;
 }
 
-// TODO
-bool determineDirection(Direction* dir, Uint8 button) {
-    switch (button) {
-        case JOY_LEFT:
-            *dir = DIR_LEFT;
-            break;
-        case JOY_UP:
-            *dir = DIR_UP;
-            break;
-        case JOY_RIGHT:
-            *dir = DIR_RIGHT;
-            break;
-        case JOY_DOWN:
-            *dir = DIR_DOWN;
-           break;
-        default:
-            return false;
+// TODO: Simplify?
+bool SnakeGame::DetermineDirection(Direction* dir, u64 buttons) {
+    if (buttons & KEY_LEFT) {
+        *dir = DIR_LEFT;
+    } else if (buttons & KEY_UP) {
+        *dir = DIR_UP;
+    } else if (buttons & KEY_RIGHT) {
+        *dir = DIR_RIGHT;
+    } else if (buttons & KEY_DOWN) {
+        *dir = DIR_DOWN;
+    } else {
+        return false;
     }
     return true;
 }
@@ -106,32 +82,6 @@ void renderBlip(SnakeGame* game, SDL_Renderer* renderer, SDL_Texture* t_blip, Bl
 }
 
 void SnakeGame::OnFrame(float delta_seconds) {
-    SDL_Event event;
-    while (SDL_PollEvent(&event)) {
-        printf("%#05x\n", event.type);
-
-        if (event.type == SDL_QUIT)
-            this->Quit();
-
-        if (event.type == SDL_JOYBUTTONDOWN) {
-            printf("Controller %d: %d\n",event.jbutton.which, event.jbutton.button);
-            if (event.jbutton.button == JOY_PLUS)
-                this->Quit();
-            Direction nextDir;
-            if (determineDirection(&nextDir, event.jbutton.button)) {
-                if (!this->has_started) {
-                    this->Start(nextDir);
-                } else {
-                    this->RequestNextDir(nextDir);
-                }
-            }
-        }
-
-        // if (event.type == SDL_CONTROLLERDEVICEADDED) {
-        //     printf("It was %d\n", event.cdevice.which);
-        // }
-    }
-
     // TODO: Can render just a part of it
     SDL_Renderer* renderer = atmy::System::get_renderer();
     SDL_Texture* t_bg = atmy::Resources::GetImage("img/t_bg.png");
@@ -162,6 +112,20 @@ void SnakeGame::OnFrame(float delta_seconds) {
     renderBlip(this, renderer, t_blip, this->loose_blip.get());
 
     SDL_RenderPresent(renderer);
+}
+
+void SnakeGame::OnButtonsDown(u64 buttons) {
+    if (buttons & KEY_PLUS)
+        return Quit();
+
+    Direction nextDir;
+    if (DetermineDirection(&nextDir, buttons)) {
+        if (!this->has_started) {
+            this->Start(nextDir);
+        } else {
+            this->RequestNextDir(nextDir);
+        }
+    }
 }
 
 void SnakeGame::RequestNextDir(Direction next) {

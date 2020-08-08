@@ -24,6 +24,7 @@ void System::Init() {
     romfsInit();
     chdir("romfs:/");
 
+    // TODO: Does SDL_Init make SDL_InitSubSystem unnecessary?
     SDL_Init(SDL_INIT_VIDEO|SDL_INIT_TIMER);
     IMG_Init(IMG_INIT_PNG);
 

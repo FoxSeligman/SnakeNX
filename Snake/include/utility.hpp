@@ -1,5 +1,4 @@
-#ifndef UTILITY_H
-#define UTILITY_H
+#pragma once
 
 typedef enum {
     DIR_LEFT = 0,
@@ -14,5 +13,3 @@ typedef struct Settings {
     int rows;
     float speed;    // Seconds per cell
 } Settings;
-
-#endif

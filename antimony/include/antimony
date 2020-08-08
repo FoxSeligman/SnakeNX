@@ -1,5 +1,6 @@
 #pragma once
 
+#include <atmy/controller.hpp>
 #include <atmy/game.hpp>
 #include <atmy/resources.hpp>
 #include <atmy/system.hpp>
